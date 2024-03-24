@@ -31,6 +31,7 @@ const Total = ({ array }) => {
 	return <p>Number of exercises {values[0] + values[1] + values[2]}</p>;
 };
 
+
 const App = () => {
 	const course = {
     name: 'Half Stack application development',
