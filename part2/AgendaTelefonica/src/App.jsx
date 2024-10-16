@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Filter from './components/Filter';
+import PersonForm from './components/PersonForm';
+import Persons from './components/Persons';
 
 
 const App = () => {
@@ -13,17 +16,14 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
 
-  // busqueda
+  // busquedor de usuario
   const [search, setSearch] = useState('');
   const filteredPersons = persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
-
 
   function handleSearch(e){
     const target = e.target.value;
     setSearch(target)
   }
-
-  
 
   function handleChange(e){
     const target = e.target;
@@ -47,31 +47,23 @@ const App = () => {
       <h2>Phonebook</h2>
 
       
-        <label>
-          filter shown with 
-         <input type="text" value={search} onChange={handleSearch}/>
-        </label>
+      <Filter value={search} onchange={handleSearch} />
       
-      <h2>add a new</h2>
-      <form onSubmit={handleSubmit}>
+      <h3>add a new</h3>
+
+      <PersonForm
+        subtim={handleSubmit} 
+        controllers={[newName, newPhoneNumber]}
+        onchange={handleChange} />
+
         
-        <div>
-          name: <input name="name" value={newName} onChange={handleChange}/>
-        </div>
-        <div>number: <input 
-                        name="phone"
-                        value={newPhoneNumber} 
-                        onChange={handleChange}/></div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      { search ? 
-        filteredPersons.map(filter => <p key={filter.name}>{filter.name} {filter.number}</p>) 
-        : persons.map( person =><p key={person.name} >{person.name} {person.number}</p>)
-      }
-      <div>debug: {newName}</div>
+      <h3>Numbers</h3>
+      <Persons 
+        filter={filteredPersons}
+        searchValue={search}
+        personsList={persons}/>
+    
+    
     </div>
   )
 }
