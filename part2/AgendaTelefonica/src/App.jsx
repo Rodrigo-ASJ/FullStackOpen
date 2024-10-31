@@ -1,16 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
+import personsService from './services/persons'
 
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ]) 
+
+  const [persons, setPersons] = useState([]) 
 
   //Controladores del formulario
   const [newName, setNewName] = useState('')
@@ -19,6 +16,12 @@ const App = () => {
   // busquedor de usuario
   const [search, setSearch] = useState('');
   const filteredPersons = persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
+
+
+  useEffect( () => {
+    personsService.getAll()
+    .then(persons => setPersons(persons))
+  },[]);
 
   function handleSearch(e){
     const target = e.target.value;
@@ -36,9 +39,16 @@ const App = () => {
 
     const newPerson = { name: newName, number: newPhoneNumber }
     const existPerson = persons.some( person => person.name === newPerson.name)
-   
+    existPerson
+      ? window.alert(`${newName} is already added to phonebook`) 
+      : personsService.create(newPerson)
+          .then( response => {
+            setPersons( prevPersons => prevPersons.concat(response) );
+        })
 
-    existPerson ? window.alert(`${newName} is already added to phonebook`): setPersons( prevPersons => prevPersons.concat(newPerson) );
+  }
+
+  function handleDelete(id){
 
   }
 
@@ -61,7 +71,9 @@ const App = () => {
       <Persons 
         filter={filteredPersons}
         searchValue={search}
-        personsList={persons}/>
+        personsList={persons}
+        deletePerson={handleDelete}
+        />
     
     
     </div>
