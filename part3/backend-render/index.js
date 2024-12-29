@@ -3,7 +3,6 @@ const http = require('node:http');
 
 const cors = require('cors');
 
-
 let notes = [
 	{
 		id: 1,
