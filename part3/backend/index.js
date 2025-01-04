@@ -29,6 +29,8 @@ app.use(cors())
 //json-parser 
 app.use(express.json())
 
+// middleware para servir archivos estáticos
+app.use(express.static('dist'))
 /*
 const app = http.createServer((request, response) => {
 	response.writeHead(200, { 'Content-type': 'application/json'});
