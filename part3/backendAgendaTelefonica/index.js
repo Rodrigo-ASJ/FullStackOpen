@@ -1,11 +1,7 @@
 const express = require('express');
-const data = require('./data/persons.json') 
+const cors = require('cors')
+//const data = require('./data/persons.json') 
 const morgan = require('morgan')
-
-
-
-
-
 
 
 let persons = [
@@ -34,11 +30,13 @@ let persons = [
 //creamos el servidor
 const app = express();
 
-
-
+app.use(cors())
 
 //json-parser 
 app.use(express.json())
+
+// middleware para servir archivos estáticos
+app.use(express.static('dist'))
 
 const requestLogger = (request, response, next) => {
     console.log('Method:', request.method)
@@ -138,7 +136,7 @@ const unknownEndpoint = (request, response) => {
   
   app.use(unknownEndpoint)
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, ()=>{
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 })
