@@ -9,14 +9,16 @@
     "build:ui": "rm -rf dist && cd ../../part2/part2-notes-frontend && npm run build && cp -r dist ../../part3/backend",
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
-    "logs:prod": "fly logs"
+    "logs:prod": "fly logs",
+    "mstart":"node mongo.js 47ax5dDuyhv6vXWm"
   },
   "author": "Rodrigo Fernández",
   "license": "MIT",
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "mongoose": "^8.10.0"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.9",
