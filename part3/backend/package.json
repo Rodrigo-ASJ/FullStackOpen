@@ -10,13 +10,14 @@
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
     "logs:prod": "fly logs",
-    "mstart":"node mongo.js 47ax5dDuyhv6vXWm"
+    "mstart": "node mongo.js"
   },
   "author": "Rodrigo Fernández",
   "license": "MIT",
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "mongoose": "^8.10.0"
   },
