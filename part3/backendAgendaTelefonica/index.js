@@ -1,9 +1,12 @@
+require('dotenv').config();
 const express = require('express');
+const Person = require('./models/person');
 const cors = require('cors')
 //const data = require('./data/persons.json') 
 const morgan = require('morgan')
 
 
+/*
 let persons = [
 		{
 			"id": 1,
@@ -26,6 +29,7 @@ let persons = [
 			"number": "39-23-6423122"
 		}
 	]
+*/
 
 //creamos el servidor
 const app = express();
@@ -53,38 +57,60 @@ const requestLogger = (request, response, next) => {
   app.use(morgan(':method :url :status :res[content-length] - :response-time ms - :pepo'))
  
 app.get('/api/persons', (request, response) =>{
-    response.status(200).json(persons);
+    Person.find({}).then( persons => {
+        response.status(200).json(persons);
+    });
+    
+
 })
 
 app.get('/info', (request, response) =>{
+    
+    Person.find({}).then( persons => {
+       
+        const maxPersons = persons.length;
+        const date = new Date();
+        const template = `<p>Phonebook has info for ${maxPersons} people</p><p>${date}</p>`
+    
+        response.status(200).send(template);
 
-    const maxPersons = persons.length;
-    const date = new Date();
-    const template = `<p>Phonebook has info for ${maxPersons} people</p><p>${date}</p>`
-
-    response.status(200).send(template);
+    });
 })
-
-
-
+    
 
 app.get('/api/persons/:id', (request, response) =>{
+    
+    const id = request.params.id;
+    Person.findById(id).then( person =>{
+        if(person){
+            response.status(200).json(person);
+        }else{
+            response.status(404).send({
+                error: 'Person not found'
+            });
+        }
 
-    const id = Number(request.params.id);
-    const findPerson = persons.find( person => person.id === id);
+    })
 
+    //const findPerson = persons.find( person => person.id === id);
+    /*
     if(!findPerson){
         return response.status(404).send({
             error: 'Person not found'
         });
-    }
+    } */
 
-    response.status(200).json(findPerson);
 
 })
 
 app.delete('/api/persons/:id', ( request, response) =>{
-	const id = Number(request.params.id);
+	const id = request.params.id;
+
+    Person.findByIdAndDelete(id).then( person => {
+     
+            response.status(204).end();
+    });
+   /* 
     findPerson = persons.find( person => person.id === id);
    if(!findPerson){
     return response.status(404).send({
@@ -92,33 +118,41 @@ app.delete('/api/persons/:id', ( request, response) =>{
     });
    }
     persons = persons.filter( person => person.id !== id);
-	response.status(204).end()
+	response.status(204).end()*/
 })
 
 app.post('/api/persons', ( request, response)=>{
 
     const body = request.body;
-    const findPerson = persons.find( person => person.name === body.name);
+    // const findPerson = persons.find( person => person.name === body.name);
 
     //validamos que los campos sean correctos
     if(!body.name || !body.number){
         return response.status(400).json({
             error: 'name and number are required'
         });
-    }if(findPerson){
+    }
+    /*
+    if(findPerson){
         return response.status(400).json({
             error: 'Person already exists, the name must be unique'
         })
     }
+        */
 
-    const newPerson = {
-        id: generateId(),
+    const newPerson = new Person({
+        //id: generateId(),
         name: body.name,
         number: body.number,
-    }
+    });
 
-    persons = persons.concat(newPerson);
-    response.status(201).json(newPerson);
+    //persons = persons.concat(newPerson);
+
+    newPerson.save().then( result => {
+        console.log( result );
+        response.status(201).json(newPerson);
+ 
+    });
 
 });
 
@@ -135,6 +169,8 @@ const unknownEndpoint = (request, response) => {
   }
   
   app.use(unknownEndpoint)
+
+
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, ()=>{
