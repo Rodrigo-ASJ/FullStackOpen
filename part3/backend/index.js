@@ -4,8 +4,6 @@ const Note = require('./models/note');
 const http = require('node:http');
 const cors = require('cors');
 
-
-
 /*
 let notes = [
 	{
@@ -29,11 +27,21 @@ let notes = [
 const app = express();
 
 app.use(cors())
+// middleware para servir archivos estáticos
+app.use(express.static('dist'))
 //json-parser 
 app.use(express.json())
 
-// middleware para servir archivos estáticos
-app.use(express.static('dist'))
+const requestLogger = (request, response, next) => {
+    console.log('Method:', request.method)
+    console.log('Path:  ', request.path)
+    console.log('Body:  ', request.body)
+    console.log('---')
+    next()
+  }
+
+  app.use(requestLogger)  
+
 /*
 const app = http.createServer((request, response) => {
 	response.writeHead(200, { 'Content-type': 'application/json'});
@@ -52,14 +60,25 @@ app.get('/api/notes', ( request, response) =>{
     
 });
 
-app.get('/api/notes/:id', (request, response) => {
+app.get('/api/notes/:id', (request, response, next) => {
 	//const id = Number(request.params.id)
 
 	//const note = notes.find(note => note.id === id)
 	
-	Note.findById(request.params.id).then( note => {
-		response.json(note);
-	})
+	Note.findById(request.params.id)
+		.then( note => {
+			if(note){
+				response.json(note);
+			}else{
+				response.status(404).end();
+			}
+		
+		})
+		.catch(error => { 
+			//console.log(error);
+			//response.status(400).send({ error: 'malformatted id' }); 
+			next(error)
+		})
 	
 	/*if (note) {
 		response.json(note)
@@ -69,14 +88,22 @@ app.get('/api/notes/:id', (request, response) => {
   })
 
 
-app.delete('/api/notes/:id', ( request, response) =>{
-	const id = Number(request.params.id);
+app.delete('/api/notes/:id', ( request, response, next) =>{
+	//const id = Number(request.params.id);
+	const id = request.params.id;
 
-	notes = notes.filter(note => note.id !== id);
-
+	Note.findByIdAndDelete(id)
+		.then( result => {
+			// eliminar una nota que existe
+			response.status(204).end(); // 204 no content
+		})
+		.catch( error =>{
+			// eliminar una nota que no existe
+			next(error);
+		});
 	
-
-	response.status(204).end()
+	// notes = notes.filter(note => note.id !== id);
+	// response.status(204).end()
 })
 
 
@@ -110,6 +137,49 @@ const generateId = () => {
   
 	//response.json(note)
   })
+
+
+  app.put( "/api/notes/:id", ( request , response, next) =>{
+
+	const id = request.params.id;
+	const body = request.body;
+
+	//objeto JavaScript normal como argumento, y no un nuevo objeto de nota creado con la función constructora Note
+	const note = {
+		content: body.content,
+   		important: body.important,
+	}
+  
+	Note.findByIdAndUpdate( id , note, { new: true })
+	 .then( updateNote =>{
+		response.json(updateNote);
+	 })
+	 .catch( error =>{
+		next(error);
+	 })
+
+  });
+
+
+  const unknownEndpoint = (request, response) => {
+	response.status(404).send({ error: 'unknown endpoint' })
+  }
+
+  // controlador de solicitudes con endpoint desconocido
+app.use(unknownEndpoint)
+
+  const errorHandler = (error, request, response, next) => {
+	console.error(error.message)
+  
+	if (error.name === 'CastError') {
+	  return response.status(400).send({ error: 'malformatted id' })
+	} 
+  
+	next(error)
+  }
+
+// este debe ser el último middleware cargado, ¡también todas las rutas deben ser registrada antes que esto!
+  app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
