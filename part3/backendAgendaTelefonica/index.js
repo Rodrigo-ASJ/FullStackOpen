@@ -78,7 +78,7 @@ app.get('/info', (request, response) =>{
 })
     
 
-app.get('/api/persons/:id', (request, response) =>{
+app.get('/api/persons/:id', (request, response, next) =>{
     
     const id = request.params.id;
     Person.findById(id).then( person =>{
@@ -90,7 +90,9 @@ app.get('/api/persons/:id', (request, response) =>{
             });
         }
 
-    })
+    }).catch( error =>{
+        next(error);
+    });
 
     //const findPerson = persons.find( person => person.id === id);
     /*
@@ -103,12 +105,14 @@ app.get('/api/persons/:id', (request, response) =>{
 
 })
 
-app.delete('/api/persons/:id', ( request, response) =>{
+app.delete('/api/persons/:id', ( request, response, next) =>{
 	const id = request.params.id;
 
-    Person.findByIdAndDelete(id).then( person => {
-     
+    Person.findByIdAndDelete(id)
+        .then( person => {
             response.status(204).end();
+    }).catch( error => {
+        next(error);
     });
    /* 
     findPerson = persons.find( person => person.id === id);
@@ -156,6 +160,28 @@ app.post('/api/persons', ( request, response)=>{
 
 });
 
+/* Si el usuario intenta crear una nueva entrada en la agenda para una persona cuyo nombre ya está en la agenda, el frontend intentará actualizar el número de teléfono de la entrada existente realizando una solicitud HTTP PUT a la URL única de la entrada. */
+app.put( '/api/persons/:id', ( request, response, next) =>{
+    const id = request.params.id;
+    const body = request.body;
+    
+    const person = {
+        name: body.name,
+        number: body.number,
+    } 
+
+    Person.findByIdAndUpdate( id, person, { new: true })
+        .then( updatePerson =>{
+            response.status(200).json(updatePerson);
+        })
+        .catch( error =>{
+            next(error);
+        })
+     
+});
+
+
+
 const generateId = ()=>{
     const maxId = persons.length > 0 
         ?  Math.floor( Math.random() * (persons.length + 100) ) 
@@ -170,6 +196,19 @@ const unknownEndpoint = (request, response) => {
   
   app.use(unknownEndpoint)
 
+/* Manejo de errores */
+
+const errorHandler = ( error, request, response, next) =>{
+    console.error( error.message);
+
+    if( error.name === 'CastError'){
+        return response.status(400).send({ error: 'Malformatted id'})
+    }
+
+    next(error);
+}
+
+app.use(errorHandler);
 
 
 const PORT = process.env.PORT || 3001;
