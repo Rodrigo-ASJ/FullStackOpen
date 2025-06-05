@@ -85,7 +85,7 @@ app.get('/api/notes/:id', (request, response, next) => {
 	  } else {
 		response.status(404).end()
 	  } */
-  })
+})
 
 
 app.delete('/api/notes/:id', ( request, response, next) =>{
@@ -112,9 +112,9 @@ const generateId = () => {
 	  ? Math.max(...notes.map(n => n.id))
 	  : 0
 	return maxId + 1
-  }
+}
 
-  app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
 	const body = request.body
   
 	if (!body.content) {
@@ -131,15 +131,19 @@ const generateId = () => {
 
 	//notes = notes.concat(note);
 
-	note.save().then( savedNote =>{
+	note.save()
+	.then( savedNote =>{
 		response.json(savedNote)
-	})
+	}).catch( error => {
+			//console.log(error);
+			next(error);
+		});
   
 	//response.json(note)
-  })
+})
 
 
-  app.put( "/api/notes/:id", ( request , response, next) =>{
+app.put( "/api/notes/:id", ( request , response, next) =>{
 
 	const id = request.params.id;
 	const body = request.body;
@@ -150,7 +154,7 @@ const generateId = () => {
    		important: body.important,
 	}
   
-	Note.findByIdAndUpdate( id , note, { new: true })
+	Note.findByIdAndUpdate( id , note, { new: true, runValidators: true, context: 'query'})
 	 .then( updateNote =>{
 		response.json(updateNote);
 	 })
@@ -158,28 +162,30 @@ const generateId = () => {
 		next(error);
 	 })
 
-  });
+});
 
 
-  const unknownEndpoint = (request, response) => {
+const unknownEndpoint = (request, response) => {
 	response.status(404).send({ error: 'unknown endpoint' })
-  }
+}
 
   // controlador de solicitudes con endpoint desconocido
 app.use(unknownEndpoint)
 
-  const errorHandler = (error, request, response, next) => {
+const errorHandler = (error, request, response, next) => {
 	console.error(error.message)
   
 	if (error.name === 'CastError') {
 	  return response.status(400).send({ error: 'malformatted id' })
-	} 
+	} else if ( error.name === 'ValidationError') {
+		return response.status(400).json({ error: error.message })
+	}
   
 	next(error)
-  }
+}
 
 // este debe ser el último middleware cargado, ¡también todas las rutas deben ser registrada antes que esto!
-  app.use(errorHandler)
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
