@@ -53,7 +53,7 @@ const app = http.createServer((request, response) => {
 */
 
 app.get('/', (request, response, next) => {
-	response.send('<h1>Hello World</h1>');
+	response.send('<h1>Hello World new</h1>');
 });
 
 app.get('/api/notes', (request, response, next) => {
