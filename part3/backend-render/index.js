@@ -35,6 +35,7 @@ let notes = [
 const app = express();
 
 app.use(cors());
+app.use('/', express.static('./dist'));
 
 // middleware para servir archivos estáticos
 //app.use(express.static('dist'));
@@ -52,12 +53,11 @@ const app = http.createServer((request, response) => {
 });
 */
 
-/*
+
 app.get('/', (request, response, next) => {
 	response.send('<h1>Hello World new</h1>');
-}); */
+}); 
 
-app.use('/', express.static('./dist'));
 
 app.get('/api/notes', (request, response, next) => {
 	Note.find({})
