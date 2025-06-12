@@ -57,7 +57,7 @@ app.get('/', (request, response, next) => {
 	response.send('<h1>Hello World new</h1>');
 }); */
 
-app.use('/', express.static('dist'));
+app.use('/', express.static('./dist'));
 
 app.get('/api/notes', (request, response, next) => {
 	Note.find({})
