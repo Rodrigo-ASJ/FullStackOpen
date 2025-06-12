@@ -37,7 +37,7 @@ const app = express();
 app.use(cors());
 
 // middleware para servir archivos estáticos
-app.use(express.static('dist'));
+//app.use(express.static('dist'));
 
 //json-parser
 app.use(express.json());
@@ -57,7 +57,7 @@ app.get('/', (request, response, next) => {
 	response.send('<h1>Hello World new</h1>');
 }); */
 
-app.use('/', express.static('/build'));
+app.use('/', express.static('dist'));
 
 app.get('/api/notes', (request, response, next) => {
 	Note.find({})
