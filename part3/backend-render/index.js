@@ -35,10 +35,10 @@ let notes = [
 const app = express();
 
 app.use(cors());
-app.use('/', express.static('./dist'));
+
 
 // middleware para servir archivos estáticos
-//app.use(express.static('dist'));
+app.use(express.static('dist'));
 
 //json-parser
 app.use(express.json());
