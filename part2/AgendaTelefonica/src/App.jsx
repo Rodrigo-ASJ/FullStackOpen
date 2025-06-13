@@ -78,7 +78,17 @@ const App = () => {
             setNotification({ message: `Added ${response.name}`, status: 'success' });
             // limpiar notificación
             setTimeout(()=>{ setNotification( (prev) => { return {...prev, message: null} })}, 5000)
-        })
+          })
+          .catch( error => {
+            // está es la forma de acceder al mensaje de error
+            console.log("error al añadir un usuario:", error.response.data.error)
+            // mostrar notificación
+              setNotification({ message: `${error.response.data.error}`, status: 'error' });
+              // limpiar notificación
+              setTimeout(()=>{ setNotification( (prev) => { return {...prev, message: null} })}, 5000)
+
+
+          })
       }
 
   }
