@@ -28,14 +28,12 @@ const favoriteBlog = (blog) => {
 }
 
 const mostBlogs = (blogs) => {
-
+    // lodash
     const authorCounts = _(blogs)
     .groupBy('author')
     .map( (blog, author) => {
-        console.log( 'blog', blog);
-        console.log( 'author', author);
         return { author, blogs: blog.length}
-    })
+    }).value()
     
 
     const reducer = ( prev, curr ) => {
@@ -48,10 +46,27 @@ const mostBlogs = (blogs) => {
 }
 
 
+const mostLikes = ( blogs )=> {
+    const authorBlogs = _(blogs)
+    .groupBy('author')
+    .map((bloglist, author)=>{
+        const totalLikes = bloglist.reduce((sum, blog) =>{
+            return sum + blog.likes
+        }, 0)
+        return { author, likes: totalLikes}
+    }).value()
+
+    const reducer = ( prev, curr ) => {
+        return prev.likes > curr.likes ? prev : curr
+    }
+    return authorBlogs.reduce(reducer, { author: null, likes: 0 })
+}
+
 
 module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
-    mostBlogs
+    mostBlogs,
+    mostLikes
 }
