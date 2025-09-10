@@ -11,7 +11,8 @@ if(process.argv.length < 3){
 
 const password = process.argv[2]; */
 
-const url = process.env.MONGODB_URI
+//const url = process.env.MONGODB_URI
+const url = process.env.TEST_MONGODB_URI
 
 mongoose.set('strictQuery',false);
 
@@ -25,19 +26,21 @@ const noteSchema = new mongoose.Schema({
 const Note = mongoose.model('Note', noteSchema)
 
 const note = new Note({
-  content: 'HTML funny',
+  content: 'testing mongoose',
   important: true,
 })
 
-/*
+
 // Generar nuevas notas
 note.save().then(result => {
   console.log('note saved!')
   mongoose.connection.close()
 })
-*/
+
+
 
 // Obtener todas las notas
+/*
 Note.find({_id:"67e0110a140b4952b9530ee1"}).then( result =>{
   //recorre todos los resultados y printalos en la consola
   result.forEach( note => { 
@@ -46,6 +49,7 @@ Note.find({_id:"67e0110a140b4952b9530ee1"}).then( result =>{
   // cierra la conexion
   mongoose.connection.close();  
 });
+*/
 
 
 
