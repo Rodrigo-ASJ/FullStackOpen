@@ -70,6 +70,10 @@ notesRouter.post('/', async (request, response, next) => {
 
 notesRouter.delete('/:id', async (request, response, next) => {
  
+  // con la libreria express-async-errors
+   await Note.findByIdAndDelete(request.params.id)
+  response.status(204).end()
+/*
  try{
   await Note.findByIdAndDelete(request.params.id);
   response.status(204).end()
@@ -77,7 +81,7 @@ notesRouter.delete('/:id', async (request, response, next) => {
  }catch(exception){
   next(exception)
  }
-
+*/
 
  
   /*
@@ -88,7 +92,7 @@ notesRouter.delete('/:id', async (request, response, next) => {
     .catch(error => next(error)) */
 })
 
-notesRouter.put('/:id',async (request, response, next) => {
+notesRouter.put('/:id', (request, response, next) => {
   
   const body = request.body
 

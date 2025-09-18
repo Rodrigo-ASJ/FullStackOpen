@@ -8,6 +8,9 @@ const config = require('./utils/config')
 const logger = require('./utils/loggers');
 const middleware = require('./utils/middleware');
 
+//libreria para no usar try & catch
+require('express-async-errors')
+
 // Controllers
 const notesRouter = require('./controllers/notes');
 

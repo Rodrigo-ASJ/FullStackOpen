@@ -12,21 +12,34 @@ const Note = require('../models/note');
 //superAgent wraper for app
 const api = supertest(app);
 
-//DB Setup
-const initialNotes = [
-  { content: 'HTML. is easy', important: false },
-  { content: 'Browser can execute only JavaScript', important: true },
-]
-
 // Reset DB before each test
 beforeEach(async () => {
   await Note.deleteMany({})
+  console.log('Cleared DB');
+  console.log('----------');
+
+  /*
+  const noteObjects = helper.initialNotes
+    .map( note => new Note(note))
+  const promiseArray = noteObjects.map(note => note.save());
+
+  await Promise.all(promiseArray) 
+  console.log('done') */
+
+  for( let note of helper.initialNotes){
+    let noteObject = new Note(note)
+    await noteObject.save()
+  }
+
+  /*
 
   let noteObject = new Note(helper.initialNotes[0])
   await noteObject.save()
 
   noteObject = new Note(helper.initialNotes[1])
   await noteObject.save()
+
+  */
 })
 
 test.only('notes are returned as json', async() => {
