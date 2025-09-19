@@ -1,8 +1,28 @@
-const { test, describe } = require('node:test');
+const { test, describe, after, beforeEach } = require('node:test');
 const assert = require('node:assert');
+const mongoose = require('mongoose');
+const supertest = require('supertest');
 
 const listHelper = require('../utils/list_helper');
 const blogs = require('../utils/blogs_for_test');
+
+//APP & models
+const app = require('../app');
+const Blog = require('../models/blog');
+
+//super Wraper
+const api = supertest(app);
+
+beforeEach( async () =>{
+	await Blog.deleteMany({});
+	console.log('Cleared DB');
+	console.log('----------');
+	for( let blog of blogs){
+		let blogObject = new Blog(blog)
+		await blogObject.save();
+	}
+	
+})
 
 describe('Dummy', () => {
 	test('dummy returns one', () => {
@@ -80,3 +100,25 @@ describe('MostLikes', () => {
 		assert.deepStrictEqual(result, exemp);
 	});
 });
+
+//4.8
+
+
+
+test.only('HTTP GET funciona correctamente', async ()=> {
+	const response = await api.get('/api/blogs')
+	assert.strictEqual(response.body.length, blogs.length)
+})
+
+//4.9
+test.only('ver si existe la propiedad id', async () => {
+	const response = await api.get('/api/blogs');
+	const blogViewed = response.body[0];
+	const blogHasId = blogViewed.hasOwnProperty('id');
+
+	assert.strictEqual(blogHasId, true);
+})
+
+after( async () =>{
+	await mongoose.connection.close();
+})
