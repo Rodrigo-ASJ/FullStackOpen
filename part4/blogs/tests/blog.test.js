@@ -119,6 +119,30 @@ test.only('ver si existe la propiedad id', async () => {
 	assert.strictEqual(blogHasId, true);
 })
 
+//4.10
+
+test.only('POST create new blog', async()=> {
+
+	 const blogsAtStart = await Blog.find({});
+
+	const newBlog =   {
+    title: "Fullstack open 2024",
+    author: "Rodrigo Fernandez",
+    url: "https://fullstackopen.com/",
+    likes: 2,
+  }
+
+  await api.post('/api/blogs')
+  	.send(newBlog)
+	.expect(201)
+	.expect('Content-Type', /application\/json/ );
+
+  const blogsAtEnd = await Blog.find({});
+
+  	assert.strictEqual( blogsAtStart.length + 1 , blogsAtEnd.length);
+
+})
+
 after( async () =>{
 	await mongoose.connection.close();
 })
