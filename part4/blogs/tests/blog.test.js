@@ -146,18 +146,37 @@ test.only('Si no existe Likes, siempre debe ser 0?', async () => {
 		title: 'Fullstack open 2025',
 		author: 'Rodrigo Fernandez',
 		url: 'https://fullstackopen.com/',
-		
 	};
+
 	
 	const createNewBlog = await api
-		.post('/api/blogs')
-		.send(newBlog);
-
+	.post('/api/blogs')
+	.send(newBlog);
+	
 	const blogViewed = createNewBlog.body;
 	const hasLikes = blogViewed.likes
+	
 
 	assert.strictEqual(hasLikes, 0);
+	
+
+	
 });
+
+
+//4.12*
+
+test.only('Si no hay title o URL, devuelve 400', async () => {
+	const newBlog = {
+		author: 'Rodrigo Fernandez',
+		likes: 2,
+	}
+
+	const createNewBlog = await api
+	.post('/api/blogs')
+	.send(newBlog)
+	.expect(400);
+})
 
 after(async () => {
 	await mongoose.connection.close();
