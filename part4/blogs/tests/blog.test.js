@@ -13,16 +13,15 @@ const Blog = require('../models/blog');
 //super Wraper
 const api = supertest(app);
 
-beforeEach( async () =>{
+beforeEach(async () => {
 	await Blog.deleteMany({});
 	console.log('Cleared DB');
 	console.log('----------');
-	for( let blog of blogs){
-		let blogObject = new Blog(blog)
+	for (let blog of blogs) {
+		let blogObject = new Blog(blog);
 		await blogObject.save();
 	}
-	
-})
+});
 
 describe('Dummy', () => {
 	test('dummy returns one', () => {
@@ -103,12 +102,10 @@ describe('MostLikes', () => {
 
 //4.8
 
-
-
-test.only('HTTP GET funciona correctamente', async ()=> {
-	const response = await api.get('/api/blogs')
-	assert.strictEqual(response.body.length, blogs.length)
-})
+test.only('HTTP GET funciona correctamente', async () => {
+	const response = await api.get('/api/blogs');
+	assert.strictEqual(response.body.length, blogs.length);
+});
 
 //4.9
 test.only('ver si existe la propiedad id', async () => {
@@ -117,32 +114,51 @@ test.only('ver si existe la propiedad id', async () => {
 	const blogHasId = blogViewed.hasOwnProperty('id');
 
 	assert.strictEqual(blogHasId, true);
-})
+});
 
 //4.10
 
-test.only('POST create new blog', async()=> {
+test.only('POST create new blog', async () => {
+	const blogsAtStart = await Blog.find({});
 
-	 const blogsAtStart = await Blog.find({});
+	const newBlog = {
+		title: 'Fullstack open 2024',
+		author: 'Rodrigo Fernandez',
+		url: 'https://fullstackopen.com/',
+		likes: 2,
+	};
 
-	const newBlog =   {
-    title: "Fullstack open 2024",
-    author: "Rodrigo Fernandez",
-    url: "https://fullstackopen.com/",
-    likes: 2,
-  }
+	await api
+		.post('/api/blogs')
+		.send(newBlog)
+		.expect(201)
+		.expect('Content-Type', /application\/json/);
 
-  await api.post('/api/blogs')
-  	.send(newBlog)
-	.expect(201)
-	.expect('Content-Type', /application\/json/ );
+	const blogsAtEnd = await Blog.find({});
 
-  const blogsAtEnd = await Blog.find({});
+	assert.strictEqual(blogsAtStart.length + 1, blogsAtEnd.length);
+});
 
-  	assert.strictEqual( blogsAtStart.length + 1 , blogsAtEnd.length);
+//4.11*
+test.only('Si no existe Likes, siempre debe ser 0?', async () => {
 
-})
+	const newBlog = {
+		title: 'Fullstack open 2025',
+		author: 'Rodrigo Fernandez',
+		url: 'https://fullstackopen.com/',
+		
+	};
+	
+	const createNewBlog = await api
+		.post('/api/blogs')
+		.send(newBlog);
 
-after( async () =>{
+	const blogViewed = createNewBlog.body;
+	const hasLikes = blogViewed.likes
+
+	assert.strictEqual(hasLikes, 0);
+});
+
+after(async () => {
 	await mongoose.connection.close();
-})
+});
