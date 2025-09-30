@@ -102,13 +102,13 @@ describe('MostLikes', () => {
 
 //4.8
 
-test.only('HTTP GET funciona correctamente', async () => {
+test('HTTP GET funciona correctamente', async () => {
 	const response = await api.get('/api/blogs');
 	assert.strictEqual(response.body.length, blogs.length);
 });
 
 //4.9
-test.only('ver si existe la propiedad id', async () => {
+test('ver si existe la propiedad id', async () => {
 	const response = await api.get('/api/blogs');
 	const blogViewed = response.body[0];
 	const blogHasId = blogViewed.hasOwnProperty('id');
@@ -118,7 +118,7 @@ test.only('ver si existe la propiedad id', async () => {
 
 //4.10
 
-test.only('POST create new blog', async () => {
+test('POST create new blog', async () => {
 	const blogsAtStart = await Blog.find({});
 
 	const newBlog = {
@@ -140,7 +140,7 @@ test.only('POST create new blog', async () => {
 });
 
 //4.11*
-test.only('Si no existe Likes, siempre debe ser 0?', async () => {
+test('Si no existe Likes, siempre debe ser 0?', async () => {
 
 	const newBlog = {
 		title: 'Fullstack open 2025',
@@ -166,7 +166,7 @@ test.only('Si no existe Likes, siempre debe ser 0?', async () => {
 
 //4.12*
 
-test.only('Si no hay title o URL, devuelve 400', async () => {
+test('Si no hay title o URL, devuelve 400', async () => {
 	const newBlog = {
 		author: 'Rodrigo Fernandez',
 		likes: 2,
@@ -176,6 +176,42 @@ test.only('Si no hay title o URL, devuelve 400', async () => {
 	.post('/api/blogs')
 	.send(newBlog)
 	.expect(400);
+})
+
+//4.13
+
+test('Eliminar un recurso', async ()=>{
+	const blogsAtStart = await Blog.find({});
+	const blogToDelete = blogsAtStart[0];
+
+	await api
+	.delete(`/api/blogs/${blogToDelete.id}`)
+	.expect(204)
+
+	const blogsAtEnd = await Blog.find({});
+
+	assert.strictEqual(blogsAtStart.length - 1, blogsAtEnd.length);
+})
+
+//4.14
+test.only('Actualizar un blog', async ()=>{
+	const blogsAtStart = await Blog.find({});
+	const blogToUpdate = blogsAtStart[0];
+	
+	const updatedBlog = {
+		...blogToUpdate, likes: blogToUpdate.likes +1
+	}
+
+	const response = await api.put(`/api/blogs/${blogToUpdate.id}`)
+		.send(updatedBlog)
+		.expect(200);
+
+		
+	const blogsAtEnd = await Blog.find({});
+	const isBlogUpdated = blogsAtEnd.find( blog => blog.id === blogToUpdate.id );
+
+	assert.strictEqual(isBlogUpdated.likes, response.body.likes)
+	
 })
 
 after(async () => {
