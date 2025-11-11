@@ -3,11 +3,13 @@ const assert = require('node:assert');
 const mongoose = require('mongoose');
 const supertest = require('supertest');
 
+const bcrypt = require('bcrypt');
 const helper = require('./test_helper');
 
 //APP && Model
 const app = require('../app');
 const Note = require('../models/note');
+const User = require('../models/user');
 
 //superAgent wraper for app
 const api = supertest(app);
@@ -105,9 +107,19 @@ describe('When there is initially some notes saved', () => {
   describe('addition of a new note', ()=>{
 
     test('succeeds with valid data', async () => {
+
+
+      const passwordHash = await bcrypt.hash('sekret', 10);
+      const user = new User({ 
+          username: 'NoteUser',
+          passwordHash });
+      
+      await user.save();    
+
       const newNote = {
           content: 'async/await simplifies making async calls',
           important: true,
+          userId: user._id
         }
     
       await api.post('/api/notes')

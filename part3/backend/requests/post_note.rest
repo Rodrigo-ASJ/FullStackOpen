@@ -2,6 +2,7 @@ POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
-	"content": "Brownie points",
-	"important": false
+	"content": "The existing code and tst need to be change when user is added to th system",
+	"important": false,
+	"userId": "6911cfa90d38feab4b594cc7"
 }

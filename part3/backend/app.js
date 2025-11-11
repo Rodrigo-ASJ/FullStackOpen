@@ -13,6 +13,7 @@ require('express-async-errors')
 
 // Controllers
 const notesRouter = require('./controllers/notes');
+const usersRouter = require('./controllers/users');
 
 // Mongoose para la conexión a MongoDB
 const mongoose = require('mongoose');
@@ -36,8 +37,9 @@ app.use(express.static('dist'))
 app.use(express.json())
 // middleware para registrar solicitudes
 app.use(middleware.requestLogger)
-// middleware para manejar solicitudes de notas
+// middleware para manejar solicitudes de notas y usuarios
 app.use('/api/notes', notesRouter)
+app.use('/api/users', usersRouter)
 // controlador de solicitudes con endpoint desconocido
 app.use(middleware.unknownEndpoint)
 //este debe ser el último middleware cargado, ¡también todas las rutas deben ser registrada antes que esto!

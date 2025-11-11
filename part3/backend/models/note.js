@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const noteSchema = new mongoose.Schema({ 
     content:{ 
         type:String,
@@ -7,6 +8,11 @@ const noteSchema = new mongoose.Schema({
         required: true
     },
     important: Boolean,
+    // referencia al usuario que la creo
+    user:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }
 });
 
 // modificar la respuesta de la base de datos en tiempo de ejecución, no cambia la base de datos
