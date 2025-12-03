@@ -1,8 +1,8 @@
 POST http://localhost:3001/api/notes
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOiI2OTE1ZmEwMGRmMzI0OTRkNDIyMDA5NWYiLCJpYXQiOjE3NjM0NTc5MDh9.PvNq4IGgUxzdKomQJmrc0jsu1q-F7ppoXJLuBEhtNa8
 
 {
 	"content": "The existing code and tst need to be change when user is added to th system",
-	"important": false,
-	"userId": "6911cfa90d38feab4b594cc7"
+	"important": false
 }

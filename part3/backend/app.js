@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 
 // Configuración y utilidades
-const config = require('./utils/config')
+const config = require('./utils/config'); //dotenv se carga aquí
 const logger = require('./utils/loggers');
 const middleware = require('./utils/middleware');
 
@@ -14,6 +14,7 @@ require('express-async-errors')
 // Controllers
 const notesRouter = require('./controllers/notes');
 const usersRouter = require('./controllers/users');
+const loginRouter = require('./controllers/login');
 
 // Mongoose para la conexión a MongoDB
 const mongoose = require('mongoose');
@@ -37,9 +38,10 @@ app.use(express.static('dist'))
 app.use(express.json())
 // middleware para registrar solicitudes
 app.use(middleware.requestLogger)
-// middleware para manejar solicitudes de notas y usuarios
+// middleware para manejar solicitudes de notas, usuarios y login
 app.use('/api/notes', notesRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 // controlador de solicitudes con endpoint desconocido
 app.use(middleware.unknownEndpoint)
 //este debe ser el último middleware cargado, ¡también todas las rutas deben ser registrada antes que esto!

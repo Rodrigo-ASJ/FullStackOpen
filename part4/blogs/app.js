@@ -9,6 +9,10 @@ const middleware = require('./utils/middleware');
 
 //Controllers
 const blogsRouter = require('./controllers/blogs.js');
+const usersRouter = require('./controllers/users.js');
+const loginsRouter = require('./controllers/logins.js');
+
+//Database
 const mongoose = require('mongoose');
 
 mongoose.set('strictQuery', false);
@@ -28,7 +32,13 @@ app.use(express.static('dist'));
 app.use(express.json());
 app.use(middleware.requestLogger);
 
+//token extractor middleware
+app.use(middleware.tokenExtractor);
+
 app.use('/api/blogs', blogsRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/login', loginsRouter);
+
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 
